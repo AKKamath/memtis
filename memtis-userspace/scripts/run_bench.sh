@@ -10,7 +10,7 @@ MEM_NODES=($(ls /sys/devices/system/node | grep node | awk -F 'node' '{print $NF
 
 CGROUP_NAME="htmm"
 ###### update DIR!
-DIR=/home/taehyung/workspace/memtis/memtis-userspace
+DIR=/home/aditya/memtis/memtis-userspace
 
 CONFIG_PERF=off
 CONFIG_NS=off
@@ -103,8 +103,8 @@ function func_main() {
 	PERF=""
     fi
     
-    # use 20 threads 
-    PINNING="taskset -c 0-19"
+    # use 24 threads 
+    PINNING="taskset -c 0-23"
 
     echo "-----------------------"
     echo "NVM RATIO: ${NVM_RATIO}"
