@@ -1,3 +1,33 @@
+## Steps for multi-process comparison with Memtis
+1. Follow the original guide to setup your machine with the Memtis Linux kernel.
+2. Open [memtis-userspace/scripts/memtis_comparison/set_vars.sh](memtis-userspace/scripts/memtis_comparison/set_vars.sh) and update with your respective directories.
+2. Open [memtis-userspace/scripts/run_bench.sh](memtis-userspace/scripts/run_bench.sh) line 13 and update with your respective directory.
+3. Run ```source setup.sh``` in the top-level directory after every reboot to setup the NUMA node with PMEM.
+4. Go to memtis-userspace and run ```sudo ./scripts/run_bench.sh -B [EXPERIMENT]``` where [EXPERIMENT] is one of ```gups```, ```gups-gups```,  ```gups-gapbs```, or ```gups-bt```.
+5. A new folder comparison_results will be created in top-level directory containing all results.
+6. You may need to reboot after every experiment due to CPU deadlocks that seem to occur.
+
+## Steps to create new multi-process workload with Memtis
+1. Create a new script file in [memtis-userspace/scripts/memtis_comparison](memtis-userspace/scripts/memtis_comparison).
+2. In this script add all the commands required to run the application(s). Make sure this script is self-contained, and path references aren't relative. Memtis will treat this script and all applications launched within it like a single process and manage tiering of memory for it.
+3. Create a new file in [memtis-userspace/bench_cmds](memtis-userspace/bench_cmds). For example memtis-userspace/bench_cmds/test_app.sh
+4. In this file set BENCH_RUN to the script file that runs all the applications and BENCH_DRAM to the DRAM the application is limited to. An example is given below for BT:
+```
+#!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source ${SCRIPT_DIR}/../scripts/memtis_comparison/set_vars.sh
+
+BENCH_RUN="${BIN}/gups_bt.sh"
+BENCH_DRAM="131072MB"
+
+export BENCH_RUN
+export BENCH_DRAM
+```
+5. Go to memtis-userspace and run ```sudo ./scripts/run_bench.sh -B test_app``` to run the new test_app script you created. Replace test_app with whatever you named your script.
+
+
+Original README for MEMTIS preserved below:
 # MEMTIS: Efficient Memory Tiering with Dynamic Page Classification and Page Size Determination
 
 ## System configuration
